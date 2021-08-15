@@ -1,52 +1,42 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ServiceStation.Core.Shop;
+using ServiceStation.Data.Paging;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ServiceStation.Data.Services
 {
-    public class ProductRepository : IProductRepository
+    public class ProductRepository : RepositoryBase<Product>, IProductRepository
     {
-        private readonly AppDbContext db;
-
-        public ProductRepository(AppDbContext db)
+        public ProductRepository(AppDbContext appDBContext)
+            : base(appDBContext)
         {
-            this.db = db;
+
         }
 
-        public Product Add(Product newProduct)
+        public Product GetProduct(int id)
         {
-            db.Add(newProduct);
-            db.SaveChanges();
-            return newProduct;
+            return FindByCondition(p => p.Id == id).FirstOrDefault();
         }
 
-        public Product Delete(int id)
+        public void CreateProduct(Product product)
         {
-            var product = Get(id);
-            if (product != null)
-            {
-                db.Products.Remove(product);
-                db.SaveChanges();
-            }
-            return product;
+            Create(product);
         }
 
-        public Product Get(int id)
+        public void UpdateProduct(Product product)
         {
-            return db.Products.Find(id);
+            Update(product);
         }
 
-        public IEnumerable<Product> GetAll()
+        public void DeleteProduct(Product product)
         {
-            return db.Products;
+            Delete(product);
         }
 
-        public Product Update(Product updatedProduct)
+        public Task<PagedList<Product>> GetProducts(PagingParameters pagingParameters)
         {
-            var entity = db.Products.Attach(updatedProduct);
-            entity.State = EntityState.Modified;
-            db.SaveChanges();
-            return updatedProduct;
+            return Task.FromResult(PagedList<Product>.GetPagedList(FindAll().OrderBy(p => p.Id), pagingParameters.PageNumber, pagingParameters.PageSize));
         }
     }
 }

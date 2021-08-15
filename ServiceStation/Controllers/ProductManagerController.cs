@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceStation.Core.Shop;
+using ServiceStation.Data.Paging;
 using ServiceStation.Data.Services;
 
 namespace ServiceStation.Controllers
@@ -18,7 +19,8 @@ namespace ServiceStation.Controllers
 
         public IActionResult Index()
         {
-            return View(_productRepository.GetAll());
+            var param = new PagingParameters();
+            return View(_productRepository.GetProducts(param));
         }
 
         [HttpGet]
@@ -33,7 +35,7 @@ namespace ServiceStation.Controllers
         {
             if (ModelState.IsValid)
             {
-                _productRepository.Add(product);
+                _productRepository.CreateProduct(product);
                 return RedirectToAction("Details", new { id = product.Id });
             }
             return View();
@@ -42,7 +44,7 @@ namespace ServiceStation.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var model = _productRepository.Get(id);
+            var model = _productRepository.GetProduct(id);
             if (model == null)
             {
                 return View("NotFound");
@@ -65,7 +67,7 @@ namespace ServiceStation.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            var model = _productRepository.Get(id);
+            var model = _productRepository.GetProduct(id);
             if (model == null)
             {
                 return View("NotFound");
@@ -77,13 +79,15 @@ namespace ServiceStation.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id, IFormCollection form)
         {
-            _productRepository.Delete(id);
+            var model = _productRepository.GetProduct(id);
+            _productRepository.Delete(model);
+
             return RedirectToAction("Index");
         }
 
         public IActionResult Details(int id)
         {
-            var model = _productRepository.Get(id);
+            var model = _productRepository.GetProduct(id);
             if (model == null)
             {
                 return View("NotFound");

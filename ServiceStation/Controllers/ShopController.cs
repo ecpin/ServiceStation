@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using ServiceStation.Core.Shop;
+using ServiceStation.Data.Paging;
 using ServiceStation.Data.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ServiceStation.Controllers
 {
@@ -14,21 +17,20 @@ namespace ServiceStation.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index([FromQuery] PagingParameters pagingParameters)
         {
-            return View(_productRepository.GetAll());
+            return View(_productRepository.GetProducts(pagingParameters));
         }
 
         [HttpGet]
         public IActionResult Details(int id)
         {
-            var model = _productRepository.Get(id);
+            var model = _productRepository.GetProduct(id);
             if (model == null)
             {
                 return View("NotFound");
             }
             return View(model);
         }
-
     }
 }
