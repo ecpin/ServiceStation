@@ -17,9 +17,9 @@ namespace ServiceStation.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index([FromQuery] PagingParameters pagingParameters)
+        public async Task<ActionResult<IEnumerable<Product>>> Index([FromQuery] PagingParameters pagingParameters)
         {
-            return View(_productRepository.GetProducts(pagingParameters));
+            return View(await _productRepository.GetProducts(pagingParameters));
         }
 
         [HttpGet]

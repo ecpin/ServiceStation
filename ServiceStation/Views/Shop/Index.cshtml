@@ -1,4 +1,4 @@
-﻿@model Task<PagedList<Product>>
+﻿@model PagedList<Product>
 
 @{
     ViewBag.Title = "Shop";
@@ -8,41 +8,41 @@
 
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.Result.CurrentPage - 1)"
+   asp-route-pageNumber="@(Model.CurrentPage - 1)"
    asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @(Model.Result.HasPrevious ? null : "disabled")">
+   class="btn btn-default @(Model.HasPrevious ? null : "disabled")">
     Previous
 </a>
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.Result.CurrentPage + 1)"
+   asp-route-pageNumber="@(Model.CurrentPage + 1)"
    asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @(Model.Result.HasNext ? null : "disabled")">
+   class="btn btn-default @(Model.HasNext ? null : "disabled")">
     Next
 </a>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Result[0].Name)
+                @Html.DisplayNameFor(model => model[0].Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Result[0].Manufacturer)
+                @Html.DisplayNameFor(model => model[0].Manufacturer)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Result[0].Description)
+                @Html.DisplayNameFor(model => model[0].Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Result[0].Category)
+                @Html.DisplayNameFor(model => model[0].Category)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Result[0].Price)
+                @Html.DisplayNameFor(model => model[0].Price)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Result)
+        @foreach (var item in Model)
         {
             <tr>
                 <td>
@@ -71,15 +71,15 @@
 </table>
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.Result.CurrentPage - 1)"
+   asp-route-pageNumber="@(Model.CurrentPage - 1)"
    asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @(Model.Result.HasPrevious ? null : "disabled")">
+   class="btn btn-default @(Model.HasPrevious ? null : "disabled")">
     Previous
 </a>
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.Result.CurrentPage + 1)"
+   asp-route-pageNumber="@(Model.CurrentPage + 1)"
    asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @(Model.Result.HasNext ? null : "disabled")">
+   class="btn btn-default @(Model.HasNext ? null : "disabled")">
     Next
 </a>
