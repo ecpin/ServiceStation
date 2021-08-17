@@ -6,7 +6,7 @@ namespace ServiceStation.Data.Services
 {
     public interface IProductRepository : IRepositoryBase<Product>
     {
-        Task<PagedList<Product>> GetProducts(PagingParameters pagingParameters);
+        Task<PagedList<Product>> GetProducts(PagingParameters pagingParameters, string sortOrder);
         Product GetProduct(int id);
         void CreateProduct(Product product);
         void UpdateProduct(Product product);

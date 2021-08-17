@@ -34,9 +34,22 @@ namespace ServiceStation.Data.Services
             Delete(product);
         }
 
-        public Task<PagedList<Product>> GetProducts(PagingParameters pagingParameters)
+        public Task<PagedList<Product>> GetProducts(PagingParameters pagingParameters, string sortOrder)
         {
-            return Task.FromResult(PagedList<Product>.GetPagedList(FindAll().OrderBy(p => p.Id), pagingParameters.PageNumber, pagingParameters.PageSize));
+            var list = FindAll();
+
+            list = sortOrder switch
+            {
+                "name_desc" => list.OrderByDescending(s => s.Name),
+                "Manufacturer" => list.OrderBy(s => s.Manufacturer),
+                "manufacturer_desc" => list.OrderByDescending(s => s.Manufacturer),
+                "Category" => list.OrderBy(s => s.Category),
+                "category_desc" => list.OrderByDescending(s => s.Category),
+                "Price" => list.OrderBy(s => s.Price),
+                "price_desc" => list.OrderByDescending(s => s.Price),
+                _ => list.OrderBy(s => s.Name),
+            };
+            return Task.FromResult(PagedList<Product>.GetPagedList(list, pagingParameters.PageNumber, pagingParameters.PageSize));
         }
     }
 }

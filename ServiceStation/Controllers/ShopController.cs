@@ -2,6 +2,7 @@
 using ServiceStation.Core.Shop;
 using ServiceStation.Data.Paging;
 using ServiceStation.Data.Services;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,9 +18,16 @@ namespace ServiceStation.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> Index([FromQuery] PagingParameters pagingParameters)
+        public async Task<ActionResult<PagedList<Product>>> Index([FromQuery] PagingParameters pagingParameters, string sortOrder)
         {
-            return View(await _productRepository.GetProducts(pagingParameters));
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["ManufacturerSortParm"] = sortOrder == "Manufacturer" ? "manufacturer_desc" : "Manufacturer";
+            ViewData["CategorySortParm"] = sortOrder == "Category" ? "category_desc" : "Category";
+            ViewData["PriceSortParm"] = sortOrder == "Price" ? "price_desc" : "Price";
+
+
+            return View(await _productRepository.GetProducts(pagingParameters, sortOrder));
         }
 
         [HttpGet]
