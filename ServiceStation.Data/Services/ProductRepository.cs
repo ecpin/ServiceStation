@@ -54,6 +54,8 @@ namespace ServiceStation.Data.Services
                 "category_desc" => list.OrderByDescending(s => s.Category),
                 "Price" => list.OrderBy(s => s.Price),
                 "price_desc" => list.OrderByDescending(s => s.Price),
+                "Id" => list.OrderBy(s => s.Id),
+                "id_desc" => list.OrderByDescending(s => s.Id),
                 _ => list.OrderBy(s => s.Name),
             };
 

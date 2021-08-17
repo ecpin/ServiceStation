@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using ServiceStation.Core.Shop;
 using ServiceStation.Data.Paging;
 using ServiceStation.Data.Services;
+using System.Threading.Tasks;
+using System;
 
 namespace ServiceStation.Controllers
 {
@@ -17,10 +19,18 @@ namespace ServiceStation.Controllers
             _productRepository = productRepository;
         }
 
-        public IActionResult Index(string sortOrder,string searchString)
+        [HttpGet]
+        public async Task<ActionResult<PagedList<Product>>> Index([FromQuery] PagingParameters pagingParameters, string sortOrder, string searchString)
         {
-            var param = new PagingParameters();
-            return View(_productRepository.GetProducts(param, sortOrder, searchString));
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["IdSortParm"] = sortOrder == "Id" ? "id_desc" : "Id";
+            ViewData["ManufacturerSortParm"] = sortOrder == "Manufacturer" ? "manufacturer_desc" : "Manufacturer";
+            ViewData["CategorySortParm"] = sortOrder == "Category" ? "category_desc" : "Category";
+            ViewData["PriceSortParm"] = sortOrder == "Price" ? "price_desc" : "Price";
+            ViewData["CurrentFilter"] = searchString;
+
+            return View(await _productRepository.GetProducts(pagingParameters, sortOrder, searchString));
         }
 
         [HttpGet]
