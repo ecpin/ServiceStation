@@ -17,10 +17,10 @@ namespace ServiceStation.Controllers
             _productRepository = productRepository;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string sortOrder,string searchString)
         {
             var param = new PagingParameters();
-            return View(_productRepository.GetProducts(param));
+            return View(_productRepository.GetProducts(param, sortOrder, searchString));
         }
 
         [HttpGet]

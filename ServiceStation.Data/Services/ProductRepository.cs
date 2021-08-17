@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServiceStation.Core.Shop;
 using ServiceStation.Data.Paging;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,9 +35,15 @@ namespace ServiceStation.Data.Services
             Delete(product);
         }
 
-        public Task<PagedList<Product>> GetProducts(PagingParameters pagingParameters, string sortOrder)
+        public Task<PagedList<Product>> GetProducts(PagingParameters pagingParameters, string sortOrder, string searchString)
         {
             var list = FindAll();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                list = list.Where(s => s.Name.Contains(searchString)
+                                       || s.Manufacturer.Contains(searchString));
+            }
 
             list = sortOrder switch
             {
@@ -49,6 +56,7 @@ namespace ServiceStation.Data.Services
                 "price_desc" => list.OrderByDescending(s => s.Price),
                 _ => list.OrderBy(s => s.Name),
             };
+
             return Task.FromResult(PagedList<Product>.GetPagedList(list, pagingParameters.PageNumber, pagingParameters.PageSize));
         }
     }

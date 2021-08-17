@@ -18,16 +18,17 @@ namespace ServiceStation.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedList<Product>>> Index([FromQuery] PagingParameters pagingParameters, string sortOrder)
+        public async Task<ActionResult<PagedList<Product>>> Index([FromQuery] PagingParameters pagingParameters, string sortOrder, string searchString)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["ManufacturerSortParm"] = sortOrder == "Manufacturer" ? "manufacturer_desc" : "Manufacturer";
             ViewData["CategorySortParm"] = sortOrder == "Category" ? "category_desc" : "Category";
             ViewData["PriceSortParm"] = sortOrder == "Price" ? "price_desc" : "Price";
+            ViewData["CurrentFilter"] = searchString;
 
 
-            return View(await _productRepository.GetProducts(pagingParameters, sortOrder));
+            return View(await _productRepository.GetProducts(pagingParameters, sortOrder, searchString));
         }
 
         [HttpGet]
