@@ -1,52 +1,65 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ServiceStation.Core.Shop;
+using ServiceStation.Data.Paging;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ServiceStation.Data.Services
 {
-    public class ProductRepository : IProductRepository
+    public class ProductRepository : RepositoryBase<Product>, IProductRepository
     {
-        private readonly AppDbContext db;
-
-        public ProductRepository(AppDbContext db)
+        public ProductRepository(AppDbContext appDBContext)
+            : base(appDBContext)
         {
-            this.db = db;
+
         }
 
-        public Product Add(Product newProduct)
+        public Product GetProduct(int id)
         {
-            db.Add(newProduct);
-            db.SaveChanges();
-            return newProduct;
+            return FindByCondition(p => p.Id == id).FirstOrDefault();
         }
 
-        public Product Delete(int id)
+        public void CreateProduct(Product product)
         {
-            var product = Get(id);
-            if (product != null)
+            Create(product);
+        }
+
+        public void UpdateProduct(Product product)
+        {
+            Update(product);
+        }
+
+        public void DeleteProduct(Product product)
+        {
+            Delete(product);
+        }
+
+        public Task<PagedList<Product>> GetProducts(PagingParameters pagingParameters, string sortOrder, string searchString)
+        {
+            var list = FindAll();
+
+            if (!String.IsNullOrEmpty(searchString))
             {
-                db.Products.Remove(product);
-                db.SaveChanges();
+                list = list.Where(s => s.Name.Contains(searchString)
+                                       || s.Manufacturer.Contains(searchString));
             }
-            return product;
-        }
 
-        public Product Get(int id)
-        {
-            return db.Products.Find(id);
-        }
+            list = sortOrder switch
+            {
+                "name_desc" => list.OrderByDescending(s => s.Name),
+                "Manufacturer" => list.OrderBy(s => s.Manufacturer),
+                "manufacturer_desc" => list.OrderByDescending(s => s.Manufacturer),
+                "Category" => list.OrderBy(s => s.Category),
+                "category_desc" => list.OrderByDescending(s => s.Category),
+                "Price" => list.OrderBy(s => s.Price),
+                "price_desc" => list.OrderByDescending(s => s.Price),
+                "Id" => list.OrderBy(s => s.Id),
+                "id_desc" => list.OrderByDescending(s => s.Id),
+                _ => list.OrderBy(s => s.Name),
+            };
 
-        public IEnumerable<Product> GetAll()
-        {
-            return db.Products;
-        }
-
-        public Product Update(Product updatedProduct)
-        {
-            var entity = db.Products.Attach(updatedProduct);
-            entity.State = EntityState.Modified;
-            db.SaveChanges();
-            return updatedProduct;
+            return Task.FromResult(PagedList<Product>.GetPagedList(list, pagingParameters.PageNumber, pagingParameters.PageSize));
         }
     }
 }

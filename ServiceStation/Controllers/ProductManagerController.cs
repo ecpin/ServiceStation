@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceStation.Core.Shop;
+using ServiceStation.Data.Paging;
 using ServiceStation.Data.Services;
+using System.Threading.Tasks;
+using System;
 
 namespace ServiceStation.Controllers
 {
@@ -16,9 +19,18 @@ namespace ServiceStation.Controllers
             _productRepository = productRepository;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<ActionResult<PagedList<Product>>> Index([FromQuery] PagingParameters pagingParameters, string sortOrder, string searchString)
         {
-            return View(_productRepository.GetAll());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["IdSortParm"] = sortOrder == "Id" ? "id_desc" : "Id";
+            ViewData["ManufacturerSortParm"] = sortOrder == "Manufacturer" ? "manufacturer_desc" : "Manufacturer";
+            ViewData["CategorySortParm"] = sortOrder == "Category" ? "category_desc" : "Category";
+            ViewData["PriceSortParm"] = sortOrder == "Price" ? "price_desc" : "Price";
+            ViewData["CurrentFilter"] = searchString;
+
+            return View(await _productRepository.GetProducts(pagingParameters, sortOrder, searchString));
         }
 
         [HttpGet]
@@ -33,7 +45,7 @@ namespace ServiceStation.Controllers
         {
             if (ModelState.IsValid)
             {
-                _productRepository.Add(product);
+                _productRepository.CreateProduct(product);
                 return RedirectToAction("Details", new { id = product.Id });
             }
             return View();
@@ -42,7 +54,7 @@ namespace ServiceStation.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var model = _productRepository.Get(id);
+            var model = _productRepository.GetProduct(id);
             if (model == null)
             {
                 return View("NotFound");
@@ -65,7 +77,7 @@ namespace ServiceStation.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            var model = _productRepository.Get(id);
+            var model = _productRepository.GetProduct(id);
             if (model == null)
             {
                 return View("NotFound");
@@ -77,13 +89,15 @@ namespace ServiceStation.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id, IFormCollection form)
         {
-            _productRepository.Delete(id);
+            var model = _productRepository.GetProduct(id);
+            _productRepository.Delete(model);
+
             return RedirectToAction("Index");
         }
 
         public IActionResult Details(int id)
         {
-            var model = _productRepository.Get(id);
+            var model = _productRepository.GetProduct(id);
             if (model == null)
             {
                 return View("NotFound");

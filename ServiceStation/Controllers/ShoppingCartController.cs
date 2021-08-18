@@ -30,7 +30,7 @@ namespace ServiceStation.Controllers
 
         public RedirectToActionResult AddToShoppingCart(int productId)
         {
-            var selectedProduct = _productRepository.Get(productId);
+            var selectedProduct = _productRepository.GetProduct(productId);
 
             if (selectedProduct != null)
             {
@@ -41,7 +41,7 @@ namespace ServiceStation.Controllers
 
         public RedirectToActionResult Redirect(int productId)
         {
-            var selectedProduct = _productRepository.Get(productId);
+            var selectedProduct = _productRepository.GetProduct(productId);
 
             if (selectedProduct != null)
             {

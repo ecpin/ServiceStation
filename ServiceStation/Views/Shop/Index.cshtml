@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ServiceStation.Core.Shop.Product>
+﻿@model PagedList<Product>
 
 @{
     ViewBag.Title = "Shop";
@@ -6,23 +6,46 @@
 
 <h1>Our products</h1>
 
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.CurrentPage - 1)"
+   asp-route-searchString="@ViewData["CurrentFilter"]"
+   class="btn btn-default @(Model.HasPrevious ? null : "disabled")">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.CurrentPage + 1)"
+asp-route-searchString="@ViewData["CurrentFilter"]"
+   class="btn btn-default @(Model.HasNext ? null : "disabled")">
+    Next
+</a>
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by name: <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model[0].Name)</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Manufacturer)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["ManufacturerSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model[0].Manufacturer)</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model[0].Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["CategorySortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model[0].Category)</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["PriceSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model[0].Price)</a>
             </th>
             <th></th>
         </tr>
@@ -55,3 +78,22 @@
         }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = !Model.HasPrevious ? "disabled" : "";
+    var nextDisabled = !Model.HasNext ? "disabled" : "";
+}
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.CurrentPage - 1)"
+   asp-route-searchString="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.CurrentPage + 1)"
+   asp-route-searchString="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
